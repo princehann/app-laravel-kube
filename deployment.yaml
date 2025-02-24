@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: laravel
+  template:
+    metadata:
+      labels:
+        app: laravel
+    spec:
+      containers:
+      - name: laravel
+        image: docker.io/vhandika/laravel-app:v7
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: laravel-app-secret
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: laravel-service
+spec:
+  selector:
+    app: laravel
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP

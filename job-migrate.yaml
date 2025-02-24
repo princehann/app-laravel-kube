@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: laravel-migrate-db0
+spec:
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: docker.io/vhandika/laravel-app:v7
+        command: ["/bin/sh", "-c", "php artisan migrate --seed"]
+        env:
+        - name: DB_HOST
+          value: "mysql-0.mysql"
+        envFrom:
+        - secretRef:
+            name: laravel-app-secret
+      restartPolicy: Never
+
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: laravel-migrate-db1
+spec:
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: docker.io/vhandika/laravel-app:v7
+        command: ["/bin/sh", "-c", "php artisan migrate --seed"]
+        env:
+        - name: DB_HOST
+          value: "mysql-1.mysql"
+        envFrom:
+        - secretRef:
+            name: laravel-app-secret
+      restartPolicy: Never
