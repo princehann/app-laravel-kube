@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: laravel
+  namespace: handika
 spec:
   replicas: 2
   selector:
@@ -14,12 +15,15 @@ spec:
     spec:
       containers:
       - name: laravel
-        image: docker.io/vhandika/laravel-app:v7
+        image: docker.io/vhandika/laravel-app:v12
         ports:
         - containerPort: 8000
+          name: laravel
         envFrom:
         - secretRef:
             name: laravel-app-secret
+        - configMapRef:
+            name: laravel-app-cm
 
 ---
 
@@ -27,10 +31,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: laravel-service
+  namespace: handika
 spec:
   selector:
     app: laravel
   ports:
   - port: 8000
     targetPort: 8000
+    name: laravel
   type: ClusterIP
