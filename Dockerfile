@@ -1,5 +1,5 @@
-FROM composer:2 AS composer
-FROM php:8.4-cli AS runtime
+FROM docker.io/library/composer:2 AS composer
+FROM docker.io/library/php:8.4-cli AS runtime
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libzip-dev \
