@@ -1,15 +1,47 @@
-FROM php:8-fpm
+FROM composer:2 AS composer
+FROM php:8.4-cli AS runtime
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         libzip-dev \
-        zip \
-        unzip \
-        && docker-php-ext-install zip pdo pdo_mysql mysqli
+	libonig-dev \
+        unzip && \
+	docker-php-ext-install -j"$(nproc)" \
+	zip \
+	mbstring \
+	pdo \
+	pdo_mysql \
+	mysqli && \
+	rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer /usr/bin/composer /usr/local/bin/composer
+
 WORKDIR /app
+
+COPY laravel-8-ecommerce/composer.json laravel-8-ecommerce/composer.lock ./
+
+RUN composer install \
+	--no-dev \
+	--prefer-dist \
+	--no-interaction \
+	--no-progress \
+	--no-scripts \
+	--optimize-autoloader
+
 COPY laravel-8-ecommerce/ .
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN composer update
-RUN php artisan key:generate && \
-    php artisan storage:link
+
+RUN mkdir -p \
+	storage/app/public \
+	storage/framework/cache \
+	storage/framework/sessions \
+	storage/framework/views \
+	storage/logs \
+	bootstrap/cache && \
+	composer dump-autoload --no-dev --optimize &&
+	php artisan package:discover --ansi && \
+	php artisan storage:link && \
+	chgrp -R 0 storage bootstrap/cache && \
+	chmod -R g=u storage bootstrap/cache
+
 EXPOSE 8000
+
 ENTRYPOINT ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
