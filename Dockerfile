@@ -1,7 +1,8 @@
 FROM docker.io/library/composer:2 AS composer
 FROM docker.io/library/php:8.0-cli AS runtime
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN sed -i '/bullseye-security/d' /etc/apt/sources.list && \
+	apt-get update && \
+	apt-get install -y --no-install-recommends \
         libzip-dev \
 	libonig-dev \
         unzip && \
