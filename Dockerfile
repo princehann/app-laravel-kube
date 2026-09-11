@@ -37,7 +37,7 @@ RUN mkdir -p \
 	storage/framework/views \
 	storage/logs \
 	bootstrap/cache && \
-	composer dump-autoload --no-dev --optimize &&
+	composer dump-autoload --no-dev --optimize && \
 	php artisan package:discover --ansi && \
 	php artisan storage:link && \
 	chgrp -R 0 storage bootstrap/cache && \
