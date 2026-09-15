@@ -53,7 +53,7 @@ RUN a2enmod rewrite \
 
 WORKDIR /var/www/html
 
-COPY . .
+COPY perpus-laravel/ .
 
 # The exercise explicitly asks for composer update. For a real production app,
 # prefer committing a known-good composer.lock and using composer install.
